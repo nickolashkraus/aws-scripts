@@ -1,2 +1,5 @@
 # Unix
 *.swp
+
+# Artifacts
+*.txt
