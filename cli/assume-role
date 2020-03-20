@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+if [ -z $1 ]; then
+	echo -en "\033[0;31m"
+	echo "Specify an AWS profile."
+	echo -en "\033[0m"
+  exit 1
+fi
+
+if [ -z $CODEBUILD_BUILD_ID ]; then
+	echo -en "\033[0;31m"
+	echo "CODEBUILD_BUILD_ID environment variable is unset."
+	echo -en "\033[0m"
+  exit 1
+fi
+
+if [ -z $DESTINATION_CODEBUILD_ROLE_ARN ]; then
+	echo -en "\033[0;31m"
+	echo "DESTINATION_CODEBUILD_ROLE_ARN environment variable is unset."
+	echo -en "\033[0m"
+  exit 1
+fi
+
+AWS_CREDENTIALS=$HOME/.aws/credentials
+if [ ! -a $AWS_CREDENTIALS ]; then
+	mkdir -p $HOME/.aws
+  touch $AWS_CREDENTIALS
+fi
+chmod 600 $AWS_CREDENTIALS
+
+ROLE_SESSION_NAME=$(echo $CODEBUILD_BUILD_ID | cut -d ':' -f 2)
+
+output=$(aws sts assume-role \
+  --role-arn "$DESTINATION_CODEBUILD_ROLE_ARN" \
+  --role-session-name "$ROLE_SESSION_NAME" \
+  --duration-seconds 3600)
+
+if [ $? -eq 255 ]; then \
+	echo -en "\033[0;31m"
+	echo "Failed to retrieve credentials."
+	echo -en "\033[0m"
+  exit 1;
+fi;
+
+AWS_ACCESS_KEY_ID=$(echo "$output" | jq '.Credentials.AccessKeyId' | tr -d '"')
+AWS_SECRET_ACCESS_KEY=$(echo "$output" | jq '.Credentials.SecretAccessKey' |  tr -d '"')
+AWS_SESSION_TOKEN=$(echo "$output" | jq '.Credentials.SessionToken' |  tr -d '"' )
+
+echo '# Temporary credentials provided by AWS Security Token Service' >> $AWS_CREDENTIALS
+echo "[$1]" >> $AWS_CREDENTIALS
+echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $AWS_CREDENTIALS
+echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $AWS_CREDENTIALS
+echo "aws_session_token = $AWS_SESSION_TOKEN" >> $AWS_CREDENTIALS
+
+echo "export AWS_PROFILE=$1"
