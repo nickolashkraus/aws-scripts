@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#
+# Usage: update-domain-contact <option> <file>
+#
+# Description: Updates the contact information for all domains.
+#
+# Warning: You must wait for the operation to complete before updating
+# subsequent contact information (eg. Administrative, Registrant, or
+# Technical).
+#
+# To retrieve the identifier for tracking the progress of the request, use
+# the GetOperationDetail API endpoint:
+#
+#   aws route53domains get-operation-detail --operation-id <operation-id>
+#
+# Examples:
+#
+#   update-domain-contact -a contact.json
+
+function usage {
+  echo 'usage: update-domain-contact [-a | -r | -t] <file>'
+}
+
+if [ -z "$1" ] || [ "$1" != '-a' -a "$1" != '-r' -a "$1" != '-t' ]; then
+	echo -en "\033[0;31m"
+  echo "Specify a valid flag (-a or -r or -t)."
+  echo "  -a = --admin-contact"
+  echo "  -r = --registrant-contact"
+  echo "  -t = --tech-contact"
+	echo -en "\033[0m\n"
+  usage
+  exit 1
+fi
+
+if [ -z "$2" ] || [ ! -f "$2" ]; then
+	echo -en "\033[0;31m"
+  echo "Specify a file (ex. contact.json)."
+	echo -en "\033[0m\n"
+  usage
+  exit 1
+fi
+
+
+domain_names=($(aws route53domains list-domains | jq '.Domains[].DomainName' | tr -d \"))
+
+for domain_name in "${domain_names[@]}"; do
+  echo "Updating contact information for $domain_name..."
+  if [ "$1" == "-a" ]; then
+    aws route53domains update-domain-contact \
+      --domain-name "$domain_name" \
+      --admin-contact file://"$2"
+  elif [ "$1" == "-r" ]; then
+    aws route53domains update-domain-contact \
+      --domain-name "$domain_name" \
+      --registrant-contact file://"$2"
+  elif [ "$1" == "-t" ]; then
+    aws route53domains update-domain-contact \
+      --domain-name "$domain_name" \
+      --tech-contact file://"$2"
+  fi
+done
