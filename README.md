@@ -1,6 +1,6 @@
 # AWS Scripts
 
-[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/NickolasHKraus/aws-scripts/blob/master/LICENSE)
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/nickolashkraus/aws-scripts/blob/master/LICENSE)
 
 A collection of helpful AWS scripts.
 
@@ -9,7 +9,7 @@ A collection of helpful AWS scripts.
 Clone the repository:
 
 ```bash
-git@github.com:NickolasHKraus/aws-scripts.git
+git@github.com:nickolashkraus/aws-scripts.git
 ```
 
 Install requirements:
