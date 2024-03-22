@@ -16,6 +16,8 @@
 # Examples:
 #
 #   update-domain-contact -a contact.json
+#
+# See: https://docs.aws.amazon.com/cli/latest/reference/route53domains/update-domain-contact.html
 
 function usage {
   echo 'usage: update-domain-contact [-a | -r | -t] <file>'
@@ -43,6 +45,7 @@ fi
 
 domain_names=($(aws route53domains list-domains | jq '.Domains[].DomainName' | tr -d \"))
 
+# TODO: You can probably do all of these at once or a subset of them.
 for domain_name in "${domain_names[@]}"; do
   echo "Updating contact information for $domain_name..."
   if [ "$1" == "-a" ]; then
