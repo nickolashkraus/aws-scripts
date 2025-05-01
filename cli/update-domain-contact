@@ -24,20 +24,20 @@ function usage {
 }
 
 if [ -z "$1" ] || [ "$1" != '-a' -a "$1" != '-r' -a "$1" != '-t' ]; then
-	echo -en "\033[0;31m"
+  echo -en "\033[0;31m"
   echo "Specify a valid flag (-a or -r or -t)."
   echo "  -a = --admin-contact"
   echo "  -r = --registrant-contact"
   echo "  -t = --tech-contact"
-	echo -en "\033[0m\n"
+  echo -en "\033[0m\n"
   usage
   exit 1
 fi
 
 if [ -z "$2" ] || [ ! -f "$2" ]; then
-	echo -en "\033[0;31m"
+  echo -en "\033[0;31m"
   echo "Specify a file (ex. contact.json)."
-	echo -en "\033[0m\n"
+  echo -en "\033[0m\n"
   usage
   exit 1
 fi

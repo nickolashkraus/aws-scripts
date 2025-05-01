@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
 
 if [ -z $1 ]; then
-	echo -en "\033[0;31m"
-	echo "Specify an AWS profile."
-	echo -en "\033[0m"
+  echo -en "\033[0;31m"
+  echo "Specify an AWS profile."
+  echo -en "\033[0m"
   exit 1
 fi
 
 if [ -z $CODEBUILD_BUILD_ID ]; then
-	echo -en "\033[0;31m"
-	echo "CODEBUILD_BUILD_ID environment variable is unset."
-	echo -en "\033[0m"
+  echo -en "\033[0;31m"
+  echo "CODEBUILD_BUILD_ID environment variable is unset."
+  echo -en "\033[0m"
   exit 1
 fi
 
 if [ -z $DESTINATION_CODEBUILD_ROLE_ARN ]; then
-	echo -en "\033[0;31m"
-	echo "DESTINATION_CODEBUILD_ROLE_ARN environment variable is unset."
-	echo -en "\033[0m"
+  echo -en "\033[0;31m"
+  echo "DESTINATION_CODEBUILD_ROLE_ARN environment variable is unset."
+  echo -en "\033[0m"
   exit 1
 fi
 
 AWS_CREDENTIALS=$HOME/.aws/credentials
 if [ ! -a $AWS_CREDENTIALS ]; then
-	mkdir -p $HOME/.aws
+  mkdir -p $HOME/.aws
   touch $AWS_CREDENTIALS
 fi
 chmod 600 $AWS_CREDENTIALS
@@ -36,10 +36,10 @@ output=$(aws sts assume-role \
   --duration-seconds 3600)
 
 if [ $? -eq 255 ]; then \
-	echo -en "\033[0;31m"
-	echo "Failed to retrieve credentials."
-	echo -en "\033[0m"
-  exit 1;
+  echo -en "\033[0;31m"
+echo "Failed to retrieve credentials."
+echo -en "\033[0m"
+exit 1;
 fi;
 
 AWS_ACCESS_KEY_ID=$(echo "$output" | jq '.Credentials.AccessKeyId' | tr -d '"')
